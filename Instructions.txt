@@ -1,0 +1,104 @@
+=====================================================
+  Project 10 — Advanced Mapping Shaders
+  Course: CST-310 Computer Graphics
+  School: Grand Canyon University
+  Authors: Jared Walker & James Hohn
+  Instructor: Ricardo Citro
+  Date: April 17, 2026
+=====================================================
+
+------------------------------------------------------
+SOFTWARE REQUIREMENTS
+------------------------------------------------------
+- Operating System : Ubuntu 22.04 LTS or later
+- Compiler         : g++ with C++17 support
+- OpenGL           : OpenGL 2.1 or higher with GLSL 1.20
+- GLFW             : libglfw3-dev
+- GLEW             : libglew-dev
+- GLM              : libglm-dev
+- SOIL             : libsoil-dev (for texture and cube map loading)
+- assimp           : libassimp-dev (included to match class compile convention)
+
+------------------------------------------------------
+INSTALL DEPENDENCIES
+------------------------------------------------------
+  sudo apt install build-essential libglfw3-dev libglew-dev \
+                   libglm-dev libsoil-dev libassimp-dev -y
+
+------------------------------------------------------
+REQUIRED ASSET FILES
+------------------------------------------------------
+Place these in the same directory as the executable:
+
+  Bump-Map.jpg        (grayscale height map for cylinder bump mapping)
+  Bump-Picture.jpg    (color brick diffuse texture for sphere)
+  posx.jpg  negx.jpg  (cube map +X and -X faces)
+  posy.jpg  negy.jpg  (cube map +Y and -Y faces)
+  posz.jpg  negz.jpg  (cube map +Z and -Z faces)
+
+The cube map faces come from the Humus free cube map repository:
+  https://www.humus.name/index.php?page=Textures
+
+For this project we used the Yokohama cube map, which unzips into
+six correctly-named files (posx.jpg, negx.jpg, posy.jpg, negy.jpg,
+posz.jpg, negz.jpg).
+
+------------------------------------------------------
+COMPILE
+------------------------------------------------------
+  g++ Proj10FinalSub.cpp -o run -lglfw -lGL -lGLEW -lSOIL -lassimp
+
+------------------------------------------------------
+RUN
+------------------------------------------------------
+  ./run
+
+------------------------------------------------------
+CONTROLS
+------------------------------------------------------
+  Arrow Left / Right    Yaw the camera left or right
+  Arrow Up / Down       Pitch the camera up or down
+  Shift + Up / Down     Move forward or backward along Z
+  W / S                 Raise or lower camera eye height
+  A / D                 Strafe left or right
+  Q / E                 Roll camera counter-clockwise / clockwise
+  Ctrl + Arrow keys     Fine-grained yaw and pitch (30 deg/sec)
+  R                     Reset camera to default position
+  ESC                   Quit program
+
+------------------------------------------------------
+SCENE DESCRIPTION
+------------------------------------------------------
+The scene shows a magenta and white checkerboard floor with three
+objects standing on it:
+
+  LEFT   : Sphere   — Bump-Picture.jpg stone brick diffuse texture
+                      with per-fragment Blinn-Phong lighting.
+
+  CENTER : Cube     — Environment cube map of the Yokohama harbor,
+                      reflected across each face using the GLSL
+                      reflect() function.
+
+  RIGHT  : Cylinder — Bump-mapped using Bump-Map.jpg as a grayscale
+                      height map, with per-fragment tangent-space
+                      normal perturbation.
+
+The checkerboard floor uses a procedural shader that computes the
+pattern from each fragment's world position.
+
+A single directional-style light is placed at world position
+(6, 8, 6). All lighting is computed per fragment inside the
+GLSL fragment shaders.
+
+------------------------------------------------------
+TROUBLESHOOTING
+------------------------------------------------------
+If you see warnings like "WARNING: Cube face missing: posx.jpg",
+the program could not find one of the cube map images. It will
+still run with a sky-blue fallback for missing faces, but for the
+correct reflection effect you need all six Yokohama cube map files
+in the working directory.
+
+If the program crashes with "Shader compile error", check that
+your OpenGL driver supports GLSL 1.20 or higher. Update drivers
+with: sudo apt install --reinstall mesa-utils
